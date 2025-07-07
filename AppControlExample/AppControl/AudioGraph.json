@@ -1,0 +1,61 @@
+{
+  "type": "RealTimeGraphRenderer",
+  "config": {
+    "microphoneEnabled": true,
+    "graph": {
+      "config": {
+        "sampleRate": 16000,
+        "bufferSize": 512
+      },
+      "nodes": [
+        {
+          "id": "multiChannelToMonoNode",
+          "type": "MultiChannelToMono"
+        },
+        {
+          "id": "busSplitterNode",
+          "type": "BusSplitter"
+        },
+        {
+          "id": "vadNode",
+          "type": "SileroVAD.SileroVAD",
+          "config": {
+                  "frameSize": 512,
+                  "threshold": 0.5,
+                  "minSilenceDurationMs": 40
+          }
+        },
+        {
+          "id": "sttNode",
+          "type": "Whisper.WhisperSTT",
+          "config": {
+            "initializeModel": true,
+            "useGPU": true
+          }
+        }
+      ],
+      "connections": [
+        {
+          "sourceNode": "inputNode",
+          "destinationNode": "multiChannelToMonoNode"
+        },
+        {
+          "sourceNode": "multiChannelToMonoNode",
+          "destinationNode": "busSplitterNode"
+        },
+        {
+          "sourceNode": "busSplitterNode",
+          "destinationNode": "vadNode"
+        },
+        {
+          "sourceNode": "busSplitterNode",
+          "destinationNode": "sttNode"
+        },
+        {
+          "sourceNode": "vadNode.end",
+          "destinationNode": "sttNode.transcribe"
+        }
+      ]
+    }
+  }
+}
