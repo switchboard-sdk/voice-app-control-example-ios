@@ -47,6 +47,24 @@ flowchart TB
     end
 ```
 
+### Project Structure
+
+```
+AppControlExample/
+├── AppControl/
+│   ├── AppControlExample.h          # Objective-C header for voice control
+│   ├── AppControlExample.mm         # C++ implementation with SwitchboardSDK integration
+│   ├── AppControlView.swift         # Main SwiftUI view
+│   ├── ListView.swift               # Movie list UI components
+│   ├── DataModels.swift             # Data models and sample movie data
+│   └── AudioGraph.json              # Audio processing pipeline configuration
+├── AppControlExampleApp.swift       # App entry point with SDK initialization
+├── AppControlExample-Bridging-Header.h # Swift-Objective-C bridging header
+
+scripts/
+└── setup.sh                        # Framework download and setup script
+```
+
 ### Code Implementation
 
 #### Audio Graph Configuration
@@ -124,13 +142,13 @@ The app initializes SwitchboardSDK with required extensions in `AppControlExampl
 ```swift
 @main
 struct AppControlExampleApp: App {
-    
+
     init() {
         SBSwitchboardSDK.initialize(withAppID: "YOUR_APP_ID", appSecret: "YOUR_APP_SECRET")
         SBWhisperExtension.initialize(withConfig: [:])
         SBSileroVADExtension.initialize(withConfig: [:])
     }
-    
+
     var body: some Scene {
         WindowGroup {
             AppControlView()
@@ -163,7 +181,7 @@ static std::map<TriggerType, std::vector<std::string>> triggerKeywords = {
 - (void)createEngine {
     NSString *filePath = [[NSBundle mainBundle] pathForResource:@"AudioGraph" ofType:@"json"];
     NSString *jsonString = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:&error];
-    
+
     const char* config = [jsonString UTF8String];
     Result<Switchboard::ObjectID> result = Switchboard::createEngine(std::string(config));
     engineID = result.value();
@@ -172,10 +190,10 @@ static std::map<TriggerType, std::vector<std::string>> triggerKeywords = {
     Switchboard::addEventListener("sttNode", "transcription", [weakSelf](const std::any& data) {
         const auto text = Config::convert<std::string>(data);
         std::string cleaned = clean(text);
-        
+
         TriggerType triggerType;
         std::string detectedKeyword;
-        
+
         if (detectTrigger(cleaned, triggerType, detectedKeyword)) {
             NSString* keyword = [NSString stringWithUTF8String:detectedKeyword.c_str()];
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -195,13 +213,13 @@ The SwiftUI interface provides reactive updates based on voice commands:
 class AppControlDelegate: NSObject, ControlDelegate, ObservableObject {
     @Published var detectedKeyword = ""
     weak var verticalListViewModel: ListViewModel?
-    
+
     func triggerDetected(_ triggerType: Int, withKeyword keyword: String) {
         guard let mode = TriggerType(rawValue: triggerType) else { return }
-        
+
         DispatchQueue.main.async {
             self.detectedKeyword = keyword
-            
+
             switch mode {
             case .next:
                 self.verticalListViewModel?.goNext()
@@ -215,8 +233,8 @@ class AppControlDelegate: NSObject, ControlDelegate, ObservableObject {
                 self.verticalListViewModel?.toggleExpand()
             case .runtimeTriggers:
                 // Find movie by title and select it
-                if let movieIndex = self.verticalListViewModel?.items.firstIndex(where: { 
-                    $0.title.lowercased() == keyword 
+                if let movieIndex = self.verticalListViewModel?.items.firstIndex(where: {
+                    $0.title.lowercased() == keyword
                 }) {
                     self.verticalListViewModel?.selectItem(at: movieIndex)
                 }
@@ -255,7 +273,7 @@ bool detectTrigger(const std::string& phrase, TriggerType& outMode, std::string&
             bestKeyword = match;
         }
     }
-    
+
     return bestLength > 0;
 }
 ```
@@ -279,7 +297,7 @@ Interact with content using voice:
 ```swift
 // Action commands
 "like", "favourite", "heart"         // Like current item
-"dislike", "don't like"             // Dislike current item  
+"dislike", "don't like"             // Dislike current item
 "expand", "details", "open"         // Expand item description
 ```
 
@@ -306,12 +324,12 @@ struct AppControlView: View {
         VStack {
             Text("Voice Control Demo")
                 .font(.title)
-            
+
             Text(delegate.detectedKeyword)
                 .fontWeight(.semibold)
                 .font(.callout)
                 .frame(minHeight: 20)
-            
+
             ListView(viewModel: verticalListViewModel)
         }
     }
@@ -368,7 +386,7 @@ Add new voice commands by extending the trigger system:
 ```cpp
 // Add new trigger types
 enum TriggerType {
-    NEXT, BACK, LIKE, DISLIKE, EXPAND, 
+    NEXT, BACK, LIKE, DISLIKE, EXPAND,
     CUSTOM_ACTION,  // New custom action
     RUNTIME_TRIGGERS, UNKNOWN
 };

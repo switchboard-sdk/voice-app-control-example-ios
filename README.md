@@ -16,7 +16,7 @@ bash scripts/setup.sh
 open AppControlExample.xcodeproj
 ```
 
-4. **Configure SwitchboardSDK credentials**
+3. **Configure SwitchboardSDK credentials**
 
 - Open `AppControlExampleApp.swift`
 - Add your SwitchboardSDK App ID and App Secret in the initialization:
@@ -25,92 +25,54 @@ open AppControlExample.xcodeproj
 SBSwitchboardSDK.initialize(withAppID: "YOUR_APP_ID", appSecret: "YOUR_APP_SECRET")
 ```
 
-3. **Build and run the project**
+4. **Build and run the project**
    - Select your target device/simulator
    - Run
 
-## Project Structure
+## How It Works
+
+### Voice Commands
+
+You can say following commands to executed attached actions:
+
+**Navigation:**
+
+- **Next**: "next", "forward", "skip", "down"
+- **Previous**: "back", "last", "previous", "up"
+
+**Actions:**
+
+- **Like**: "like", "favourite", "heart"
+- **Dislike**: "dislike", "dont like", "do not like"
+- **Expand**: "expand", "details", "open"
+
+### Voice Processing Pipeline
 
 ```
-AppControlExample/
-├── AppControl/
-│   ├── AppControlExample.h          # Objective-C header for voice control
-│   ├── AppControlExample.mm         # C++ implementation with SwitchboardSDK integration
-│   ├── AppControlView.swift         # Main SwiftUI view
-│   ├── ListView.swift               # Movie list UI components
-│   ├── DataModels.swift             # Data models and sample movie data
-│   └── AudioGraph.json              # Audio processing pipeline configuration
-├── AppControlExampleApp.swift       # App entry point with SDK initialization
-├── AppControlExample-Bridging-Header.h # Swift-Objective-C bridging header
-
-scripts/
-└── setup.sh                        # Framework download and setup script
+Microphone → Voice Activity Detection → Speech Recognition → String Processing → UI Action
 ```
 
-## How SwitchboardSDK Integration Works
+The example implements an audio pipline that captures audio from microphone, processes voice via Whisper Speech-To-Text, processes text output from Speech-To-Text engine and matches keywords defined by the app.
 
-### 1. SDK Initialization
+The voice pipeline is configured in `AudioGraph.json`:
 
-The app initializes three SwitchboardSDK extensions in `AppControlExampleApp.swift`:
+### Processing Flow
 
-```swift
-SBSwitchboardSDK.initialize(withAppID: "YOUR_APP_ID", appSecret: "YOUR_APP_SECRET")
-SBWhisperExtension.initialize(withConfig: [:])
-SBSileroVADExtension.initialize(withConfig: [:])
-```
+1. **Microphone input** captured and converted to mono
+2. **Voice Activity Detection** triggers when speech is detected
+3. **Speech Recognition** converts speech to text
+4. **String Processing** matches keywords and triggers UI actions
 
-### 2. Audio Processing Pipeline
+### SDK Components
 
-The audio processing is configured via `AudioGraph.json`:
+- **SBSwitchboardSDK**: Core audio processing engine
+- **SBWhisperExtension**: Speech-to-text conversion
+- **SBSileroVADExtension**: Voice activity detection
 
-- **Input**: Microphone audio capture
-- **MultiChannelToMono**: Converts stereo to mono audio
-- **BusSplitter**: Splits audio stream for parallel processing
-- **SileroVAD**: Detects voice activity to trigger speech recognition
-- **WhisperSTT**: Converts speech to text when voice activity is detected
+**Movie Navigation:**
 
-### 3. Engine Management
-
-The C++ implementation (`AppControlExample.mm`) handles:
-
-- **Engine Creation**: Loads the audio graph configuration
-- **Event Handling**: Listens for transcription events from the STT node
-- **Trigger Processing**: Analyzes transcribed text for voice commands
-- **Delegate Communication**: Sends recognized commands to the SwiftUI interface
-
-### 4. Voice Command Processing
-
-The example implements a system that processes text output from Whisper Speech-To-Text engine and matches keywords defined by the app:
-
-#### Navigation Commands
-
-- **"next"**, **"forward"**, **"skip"**, **"down"** - Navigate to next item
-- **"back"**, **"last"**, **"previous"**, **"up"** - Navigate to previous item
-
-#### Action Commands
-
-- **"like"**, **"favourite"**, **"heart"** - Like current item
-- **"dislike"**, **"don't like"**, **"do not like"** - Dislike current item
-- **"expand"**, **"details"**, **"open"** - Expand item description
-
-#### Runtime Commands (demonstrates how to setup trigger keywords at runtime)
-
-- **Movie titles** - Say any movie title to jump directly to that item
-  - "Dune", "Matrix", "Avatar", "Inception", etc.
-
-### How Voice Recognition Works
-
-1. **Continuous Listening**: The app continuously monitors audio through the microphone
-2. **Voice Activity Detection**: Silero VAD detects when speech begins and ends
-3. **Speech Recognition**: Whisper STT converts detected speech to text
-4. **Command Processing**: The system analyzes the text for known commands
-5. **UI Updates**: Recognized commands trigger corresponding UI actions
-
-### Voice Processing Flow
-
-```
-Microphone → Voice Activity Detection → Speech Recognition → Command Processing → UI Action
-```
+- Say any movie title to jump directly to that item:
+- "Dune", "Jaws", "Matrix", "Tron", "Soul", "Frozen", "Avatar", "Inception", "Interstellar"
 
 ## Customization
 
@@ -129,3 +91,6 @@ Microphone → Voice Activity Detection → Speech Recognition → Command Proce
 
 - Modify `AudioGraph.json` to adjust VAD sensitivity
 - Update buffer sizes and sample rates as needed
+
+
+
