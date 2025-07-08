@@ -1,6 +1,6 @@
 #import "AppControlExample.h"
 
-#include <switchboard/SwitchboardV3.hpp>
+#include <switchboard/Switchboard.hpp>
 #include <algorithm>
 #include <regex>
 
@@ -125,15 +125,15 @@ bool detectTrigger(const std::string& phrase, TriggerType& outMode, std::string&
     }
 
     const char* config = [jsonString UTF8String];
-    Result<SwitchboardV3::ObjectID> result = SwitchboardV3::createEngine(std::string(config));
+    Result<Switchboard::ObjectID> result = Switchboard::createEngine(std::string(config));
     if (result.isError()) {
         return;
     }
-    engineID = result.value().value();
+    engineID = result.value();
 
     AppControlExample* __weak weakSelf = self;
-    SwitchboardV3::addEventListener("sttNode", "transcription", [weakSelf](const std::any& data) {
-        const auto text = Config::toString(data);
+    Switchboard::addEventListener("sttNode", "transcription", [weakSelf](const std::any& data) {
+        const auto text = Config::convert<std::string>(data);
         std::string cleaned = clean(text);
         
         AppControlExample* strongSelf = weakSelf;
@@ -152,14 +152,14 @@ bool detectTrigger(const std::string& phrase, TriggerType& outMode, std::string&
 }
 
 - (void)startEngine {
-    auto startEngineResult = SwitchboardV3::callAction(engineID, "start");
+    auto startEngineResult = Switchboard::callAction(engineID, "start");
     if (startEngineResult.isError()) {
         NSLog(@"Failed to start audio engine");
     }
 }
 
 - (void)stopEngine {
-    auto stopEngineResult = SwitchboardV3::callAction(engineID, "stop");
+    auto stopEngineResult = Switchboard::callAction(engineID, "stop");
     if (stopEngineResult.isError()) {
         NSLog(@"Failed to stop audio engine");
     }
