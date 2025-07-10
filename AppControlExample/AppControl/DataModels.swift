@@ -1,4 +1,4 @@
-enum TriggerType: Int  {
+@objc enum TriggerType: Int  {
     case next = 0
     case back = 1
     case like = 2
