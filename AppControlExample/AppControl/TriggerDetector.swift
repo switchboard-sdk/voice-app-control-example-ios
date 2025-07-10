@@ -12,7 +12,7 @@ class TriggerResult: NSObject {
     }
 }
 
-@objc class StringUtils: NSObject {
+@objc class TriggerDetector: NSObject {
     
     // Keywords organized by trigger type
     private static var triggerKeywords: [TriggerType: [String]] = [
@@ -25,12 +25,12 @@ class TriggerResult: NSObject {
     ]
     
     // Trim function to remove leading/trailing whitespace
-    @objc static func trim(_ str: String) -> String {
+    static func trim(_ str: String) -> String {
         return str.trimmingCharacters(in: .whitespacesAndNewlines)
     }
     
     // Clean function to remove regex patterns, trim, lowercase and remove punctuation
-    @objc static func clean(_ phrase: String) -> String {
+    static func clean(_ phrase: String) -> String {
         var input = phrase
         
         // Remove patterns like [text], (text), *text*
@@ -49,8 +49,7 @@ class TriggerResult: NSObject {
         return input
     }
     
-    // Keyword detection function
-    @objc static func findLongestMatch(_ phrase: String, keywords: [String]) -> String {
+    static func findLongestMatch(_ phrase: String, keywords: [String]) -> String {
         var bestLength = 0
         var bestMatch = ""
         
@@ -65,7 +64,7 @@ class TriggerResult: NSObject {
     }
     
     // Trigger detection function
-    @objc static func detectTrigger(_ phrase: String) -> TriggerResult {
+    static func detectTrigger(_ phrase: String) -> TriggerResult {
         let cleanedPhrase = clean(phrase)
         var bestLength = 0
         var bestTriggerType: TriggerType = .unknown
@@ -85,7 +84,7 @@ class TriggerResult: NSObject {
     }
     
     // Add runtime triggers
-    @objc static func setRuntimeTriggers(_ triggers: [String]) {
+    static func setRuntimeTriggers(_ triggers: [String]) {
         triggerKeywords[.runtimeTriggers] = triggers.map { clean($0) }
     }
 }
