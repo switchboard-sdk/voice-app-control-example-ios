@@ -16,9 +16,8 @@ This example demonstrates how to build a voice-controlled iOS application using 
 The application uses SwitchboardSDK's audio processing pipeline to create a seamless voice control experience. The architecture consists of:
 
 1. **Audio Processing Pipeline** - Configurable audio graph with microphone input, voice activity detection, and speech recognition
-2. **C++ Voice Processing Engine** - Custom trigger detection and keyword matching system
+2. **Swift Voice Processing Engine** - Native trigger detection and keyword matching system
 3. **SwiftUI Interface** - Modern iOS interface with reactive voice command feedback
-4. **Objective-C Bridge** - Seamless integration between C++ SwitchboardSDK and Swift UI
 
 ```mermaid
 flowchart TB
@@ -27,16 +26,12 @@ flowchart TB
         Delegate --> ViewModel[ListViewModel]
     end
 
-    subgraph "Objective-C Bridge"
-        Delegate --> ObjC[AppControlExample]
-        ObjC --> Protocol[ControlDelegate]
-    end
-
-    subgraph "C++ Voice Processing"
-        ObjC --> Engine[SwitchboardSDK Engine]
+    subgraph "Swift Voice Processing"
+        Delegate --> Swift[AppControlEngine]
+        Swift --> Engine[SwitchboardSDK Engine]
         Engine --> VAD[Silero VAD]
         Engine --> STT[Whisper STT]
-        Engine --> Triggers[Trigger Detection]
+        Engine --> Triggers[TriggerDetector]
     end
 
     subgraph "Audio Pipeline"
@@ -52,14 +47,13 @@ flowchart TB
 ```
 AppControlExample/
 ├── AppControl/
-│   ├── AppControlExample.h          # Objective-C header for voice control
-│   ├── AppControlExample.mm         # C++ implementation with SwitchboardSDK integration
+│   ├── AppControlExample.swift      # Swift implementation with SwitchboardSDK integration
+│   ├── TriggerDetector.swift        # Swift trigger detection and command processing
 │   ├── AppControlView.swift         # Main SwiftUI view
 │   ├── ListView.swift               # Movie list UI components
 │   ├── DataModels.swift             # Data models and sample movie data
 │   └── AudioGraph.json              # Audio processing pipeline configuration
 ├── AppControlExampleApp.swift       # App entry point with SDK initialization
-├── AppControlExample-Bridging-Header.h # Swift-Objective-C bridging header
 
 scripts/
 └── setup.sh                        # Framework download and setup script
@@ -159,48 +153,56 @@ struct AppControlExampleApp: App {
 
 #### Voice Command Processing Engine
 
-The C++ implementation handles voice command detection and processing:
+The Swift implementation handles voice command detection and processing:
 
-```cpp
-// AppControlExample.mm
-enum TriggerType {
-   NEXT, BACK, LIKE, DISLIKE, EXPAND, RUNTIME_TRIGGERS, UNKNOWN
-};
+```swift
+// AppControlExample.swift
+@objc enum TriggerType: Int {
+    case next, back, like, dislike, expand, runtimeTriggers, unknown
+}
 
 // Keywords organized by trigger type
-static std::map<TriggerType, std::vector<std::string>> triggerKeywords = {
-    {TriggerType::NEXT, {"next", "forward", "skip", "down"}},
-    {TriggerType::BACK, {"back", "last", "previous", "up"}},
-    {TriggerType::LIKE, {"like", "favourite", "heart"}},
-    {TriggerType::DISLIKE, {"dislike", "dont like", "do not like"}},
-    {TriggerType::EXPAND, {"expand", "details", "open"}},
-    {TriggerType::RUNTIME_TRIGGERS, {/* populated at runtime */}}
-};
+private static var triggerKeywords: [TriggerType: [String]] = [
+    .next: ["next", "forward", "skip", "down"],
+    .back: ["back", "last", "previous", "up"],
+    .like: ["like", "favourite", "heart"],
+    .dislike: ["dislike", "dont like", "do not like"],
+    .expand: ["expand", "details", "open"],
+    .runtimeTriggers: []
+]
 
 // Engine creation and event handling
-- (void)createEngine {
-    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"AudioGraph" ofType:@"json"];
-    NSString *jsonString = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:&error];
+func createEngine() {
+    guard let filePath = Bundle.main.path(forResource: "AudioGraph", ofType: "json"),
+          let jsonString = try? String(contentsOfFile: filePath, encoding: .utf8)
+    else {
+        print("Error reading JSON file")
+        return
+    }
 
-    const char* config = [jsonString UTF8String];
-    Result<Switchboard::ObjectID> result = Switchboard::createEngine(std::string(config));
-    engineID = result.value();
+    guard let jsonData = jsonString.data(using: .utf8),
+          let config = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any]
+    else {
+        print("Error parsing JSON")
+        return
+    }
 
+    let createEngineResult = Switchboard.createEngine(withConfig: config)
+    engineID = createEngineResult.value! as String
+    
     // Listen for transcription events
-    Switchboard::addEventListener("sttNode", "transcription", [weakSelf](const std::any& data) {
-        const auto text = Config::convert<std::string>(data);
-        std::string cleaned = clean(text);
+    let listenerResult = Switchboard.addEventListener("sttNode", eventName: "transcription") { [weak self] eventData in
+        guard let self = self,
+              let transcriptionText = eventData as? String else { return }
 
-        TriggerType triggerType;
-        std::string detectedKeyword;
-
-        if (detectTrigger(cleaned, triggerType, detectedKeyword)) {
-            NSString* keyword = [NSString stringWithUTF8String:detectedKeyword.c_str()];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [strongSelf.delegate triggerDetected:(NSInteger)triggerType withKeyword:keyword];
-            });
+        let result = TriggerDetector.detectTrigger(transcriptionText)
+        
+        if result.detected {
+            DispatchQueue.main.async {
+                self.delegate?.triggerDetected(result.triggerType.rawValue, withKeyword: result.keyword)
+            }
         }
-    });
+    }
 }
 ```
 
@@ -248,33 +250,45 @@ class AppControlDelegate: NSObject, ControlDelegate, ObservableObject {
 
 The system includes sophisticated text processing for accurate command recognition:
 
-```cpp
+```swift
 // Clean function removes punctuation and normalizes text
-static std::string clean(const std::string& phrase) {
-    std::regex pattern(R"(\[[^\]]*\]|\([^\)]*\)|\*[^*]*\*)");
-    std::string input = std::regex_replace(phrase, pattern, "");
-    input = trim(input);
-    std::transform(input.begin(), input.end(), input.begin(), ::tolower);
-    input.erase(std::remove_if(input.begin(), input.end(), ::ispunct), input.end());
-    return input;
+static func clean(_ phrase: String) -> String {
+    var input = phrase
+    
+    // Remove patterns like [text], (text), *text*
+    let pattern = "\\[[^\\]]*\\]|\\([^\\)]*\\)|\\*[^*]*\\*"
+    input = input.replacingOccurrences(of: pattern, with: "", options: .regularExpression)
+    
+    // Trim whitespace
+    input = trim(input)
+    
+    // Convert to lowercase
+    input = input.lowercased()
+    
+    // Remove punctuation
+    input = input.components(separatedBy: CharacterSet.punctuationCharacters).joined()
+    
+    return input
 }
 
 // Trigger detection finds longest matching keywords
-bool detectTrigger(const std::string& phrase, TriggerType& outMode, std::string& outKeyword) {
-    size_t bestLength = 0;
-    TriggerType bestTriggerType = TriggerType::UNKNOWN;
-    std::string bestKeyword;
-
-    for (const auto& [triggerType, keywords] : triggerKeywords) {
-        std::string match = findLongestMatch(phrase, keywords);
-        if (!match.empty() && match.length() > bestLength) {
-            bestTriggerType = triggerType;
-            bestLength = match.length();
-            bestKeyword = match;
+static func detectTrigger(_ phrase: String) -> TriggerResult {
+    let cleanedPhrase = clean(phrase)
+    var bestLength = 0
+    var bestTriggerType: TriggerType = .unknown
+    var bestKeyword = ""
+    
+    for (triggerType, keywords) in triggerKeywords {
+        let match = findLongestMatch(cleanedPhrase, keywords: keywords)
+        if !match.isEmpty && match.count > bestLength {
+            bestTriggerType = triggerType
+            bestLength = match.count
+            bestKeyword = match
         }
     }
-
-    return bestLength > 0;
+    
+    let detected = bestLength > 0
+    return TriggerResult(triggerType: bestTriggerType, keyword: bestKeyword, detected: detected)
 }
 ```
 
@@ -383,33 +397,39 @@ The audio processing flow ensures low-latency voice recognition:
 
 Add new voice commands by extending the trigger system:
 
-```cpp
+```swift
 // Add new trigger types
-enum TriggerType {
-    NEXT, BACK, LIKE, DISLIKE, EXPAND,
-    CUSTOM_ACTION,  // New custom action
-    RUNTIME_TRIGGERS, UNKNOWN
-};
+@objc enum TriggerType: Int {
+    case next, back, like, dislike, expand
+    case customAction  // New custom action
+    case runtimeTriggers, unknown
+}
 
 // Add corresponding keywords
-static std::map<TriggerType, std::vector<std::string>> triggerKeywords = {
-    {TriggerType::CUSTOM_ACTION, {"custom", "special", "action"}},
+private static var triggerKeywords: [TriggerType: [String]] = [
+    .customAction: ["custom", "special", "action"],
     // ... existing keywords
-};
+]
 ```
 
 ### Engine Lifecycle Management
 
 Control the voice recognition engine lifecycle:
 
-```objc
+```swift
 // Engine management
-- (void)startEngine {
-    auto startEngineResult = Switchboard::callAction(engineID, "start");
+func startEngine() {
+    let startEngineResult = Switchboard.callAction(withObjectID: engineID, actionName: "start", params: nil)
+    if startEngineResult.error != nil {
+        print("Failed to start audio engine: \(startEngineResult.error?.localizedDescription ?? "Unknown error")")
+    }
 }
 
-- (void)stopEngine {
-    auto stopEngineResult = Switchboard::callAction(engineID, "stop");
+func stopEngine() {
+    let stopEngineResult = Switchboard.callAction(withObjectID: engineID, actionName: "stop", params: nil)
+    if stopEngineResult.error != nil {
+        print("Failed to stop audio engine: \(stopEngineResult.error?.localizedDescription ?? "Unknown error")")
+    }
 }
 ```
 

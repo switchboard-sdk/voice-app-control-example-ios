@@ -81,7 +81,7 @@ The voice pipeline is configured in `AudioGraph.json`:
 
 ### Adding New Voice Commands
 
-1. Update the `triggerKeywords` map in `AppControlExample.mm`
+1. Update the `triggerKeywords` map in `TriggerDetector.swift`
 2. Add corresponding trigger type to `TriggerType` enum
 3. Handle the new trigger in `AppControlDelegate.triggerDetected`
 
