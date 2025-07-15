@@ -1,6 +1,6 @@
-# Building Voice-Controlled iOS Apps with On-Device AI: A Complete Guide
+# Offline Voice Control: Building a Hands-Free iOS App with On-Device AI
 
-_Transform your iOS app into a voice-controlled experience using real-time speech recognition and intelligent command processing_
+*Transform your iOS app into a voice-controlled experience using real-time speech recognition and intelligent command processing*
 
 ## The Voice Control Revolution in Mobile Apps
 
@@ -8,23 +8,32 @@ Picture this: You're using your favorite movie streaming app, but instead of tap
 
 This isn't science fiction—it's the present reality of on-device voice control, and it's transforming how users interact with mobile applications. In this comprehensive guide, we'll walk you through building a fully voice-controlled iOS app using SwitchboardSDK, complete with real-time speech recognition, intelligent command processing, and seamless user experience.
 
-## Why On-Device Voice Control Matters
+## Why Offline Voice Control Matters
 
 ### The Privacy Advantage
-
 When voice processing happens entirely on the user's device, sensitive audio data never leaves their phone. This isn't just a nice-to-have feature—it's becoming a fundamental requirement as privacy regulations tighten and users become more conscious of their data security.
 
 ### Performance That Delivers
-
 Cloud-based voice recognition introduces latency that can make interactions feel sluggish. On-device processing eliminates network delays, providing the instant responsiveness users expect from modern applications.
 
 ### Reliability You Can Count On
-
 Your app works perfectly whether users are on a mountain with no cell service or in a subway tunnel with spotty Wi-Fi. On-device voice control ensures consistent functionality regardless of connectivity.
 
-## What We're Building: A Voice-Controlled Movie Browser
+## Problems with Cloud-Based Voice UIs
 
-Our example application demonstrates sophisticated voice control capabilities:
+Traditional voice interfaces face significant challenges:
+
+**Network Dependencies**: Cloud-based solutions require constant internet connectivity, limiting functionality in areas with poor signal.
+
+**Privacy Concerns**: Voice data transmitted to remote servers raises security and compliance issues, especially in regulated industries.
+
+**Latency Issues**: Round-trip processing introduces delays that break the natural flow of conversation.
+
+**Scalability Costs**: Processing voice data in the cloud becomes increasingly expensive as user base grows.
+
+## Demo Use Case: Voice-Controlled Movie Browser
+
+Our example application demonstrates sophisticated voice control capabilities in a movie browsing interface:
 
 - **Natural Navigation**: Users can say "next", "previous", "forward", or "back" to browse through content
 - **Intelligent Actions**: Commands like "like this", "expand details", or "dislike" trigger specific UI responses
@@ -33,33 +42,61 @@ Our example application demonstrates sophisticated voice control capabilities:
 
 The app showcases how voice control can make complex navigation feel effortless and intuitive.
 
-## Solution
+## Why Switchboard?
+
+Switchboard SDK provides a complete on-device voice processing solution that addresses the limitations of cloud-based approaches:
+
+- **True Offline Processing**: All voice recognition happens locally on the device
+- **Real-Time Performance**: Optimized algorithms ensure minimal latency
+- **Privacy by Design**: No voice data ever leaves the user's device
+- **Modular Architecture**: Flexible audio processing pipeline that can be customized for specific use cases
+
+## Architecture Overview
+
+The application uses a sophisticated audio processing pipeline built on SwitchboardSDK:
 
 ```
-Microphone → Switchboard SDK's Audio Processing Pipline → Command Parsing → UI Action
+Microphone → Voice Activity Detection → Speech Recognition → Command Processing → UI Action
 ```
 
-### Audio Processing Pipline
+### Core Components
 
-The magic happens through a Switchboard SDK's audio processing pipeline:
+1. **Audio Processing Pipeline**: Configurable audio graph with microphone input, voice activity detection, and speech recognition
+2. **Swift Voice Processing Engine**: Native trigger detection and keyword matching system
+3. **SwiftUI Interface**: Modern iOS interface with reactive voice command feedback
 
+### Solution Flow
+
+```mermaid
+flowchart TB
+    subgraph "iOS SwiftUI Layer"
+        UI[SwiftUI Views] --> Delegate[AppControlDelegate]
+        Delegate --> ViewModel[ListViewModel]
+    end
+
+    subgraph "Swift Voice Processing"
+        Delegate --> Swift[AppControlEngine]
+        Swift --> Engine[SwitchboardSDK Engine]
+        Engine --> VAD[Silero VAD]
+        Engine --> STT[Whisper STT]
+        Engine --> Triggers[TriggerDetector]
+    end
+
+    subgraph "Audio Pipeline"
+        Mic[Microphone] --> Engine
+        VAD --> STT
+        STT --> Triggers
+        Triggers --> Delegate
+    end
 ```
-Audio In → Voice Activity Detection → Speech Recognition → Command Processing → UI Action
-```
 
-### Command Parsing
+## Hands-On Guide: Technical Implementation
 
-The core engine manages audio processing, speech recognition, and command matching using SwitchboardSDK, providing
-
-### UI Action
-
-The modern iOS interface provides reactive updates and smooth animations. Voice commands trigger immediate visual feedback, creating a responsive user experience.
-
-## Prerequisites and Setup
+### Prerequisites and Setup
 
 Before diving into the implementation, ensure you have:
 
-- **Xcode 12.0 or later** - For iOS development
+- **Xcode 16.0 or later** - For iOS development
 - **iOS 13.0 or later** - Target deployment version
 - **SwitchboardSDK credentials** - App ID and App Secret from [switchboard.audio](https://switchboard.audio)
 
@@ -68,60 +105,39 @@ Before diving into the implementation, ensure you have:
 Getting started is straightforward:
 
 1. **Download the SwitchboardSDK frameworks:**
-
    ```bash
    bash scripts/setup.sh
    ```
 
 2. **Open the project in Xcode:**
-
    ```bash
    open AppControlExample.xcodeproj
    ```
 
 3. **Configure your credentials in `AppControlExampleApp.swift`:**
-
    ```swift
    SBSwitchboardSDK.initialize(withAppID: "YOUR_APP_ID", appSecret: "YOUR_APP_SECRET")
    ```
 
 4. **Build and run** - Select your device and press Run
 
-## The Voice Command System
+### The Voice Command System
 
-### Complete Command Reference
-
-Our app recognizes 21 different voice commands across three categories:
+Our app recognizes voice commands across three categories:
 
 **Navigation Commands:**
-
 - **Next**: "next", "forward", "skip", "down"
 - **Previous**: "back", "last", "previous", "up"
 
 **Action Commands:**
-
 - **Like**: "like", "favourite", "heart"
 - **Dislike**: "dislike", "dont like", "do not like"
 - **Expand**: "expand", "details", "open"
 
 **Smart Navigation:**
-
 - **Movie Titles**: "Dune", "Jaws", "Matrix", "Tron", "Soul", "Frozen", "Avatar", "Inception", "Interstellar"
 
-### How Commands Are Processed
-
-The system uses sophisticated text processing to ensure accurate command recognition:
-
-1. **Audio Capture**: Continuous microphone monitoring at 16kHz
-2. **Voice Activity Detection**: Silero VAD identifies speech segments
-3. **Speech Recognition**: Whisper STT converts speech to text
-4. **Text Cleaning**: Removes punctuation and normalizes formatting
-5. **Command Matching**: Longest-match algorithm finds the best keyword
-6. **UI Updates**: Corresponding actions execute in the SwiftUI interface
-
-## Deep Dive: The Audio Processing Pipeline
-
-### AudioGraph.json Configuration
+### AudioGraph Configuration
 
 The heart of our voice control system is the `AudioGraph.json` configuration file, which defines the entire audio processing pipeline:
 
@@ -165,7 +181,7 @@ The heart of our voice control system is the `AudioGraph.json` configuration fil
 
 ### SDK Integration
 
-The app initializes three crucial SwitchboardSDK extensions:
+The app initializes SwitchboardSDK with required extensions:
 
 ```swift
 @main
@@ -175,7 +191,7 @@ struct AppControlExampleApp: App {
         SBWhisperExtension.initialize(withConfig: [:])
         SBSileroVADExtension.initialize(withConfig: [:])
     }
-
+    
     var body: some Scene {
         WindowGroup {
             AppControlView()
@@ -184,11 +200,9 @@ struct AppControlExampleApp: App {
 }
 ```
 
-## Implementation: The Swift Engine
-
 ### Voice Command Processing Engine
 
-The core string processing happens in Swift, providing native iOS performance and type safety for real-time voice recognition:
+The core processing happens in Swift, providing native iOS performance and type safety:
 
 ```swift
 @objc enum TriggerType: Int {
@@ -212,20 +226,20 @@ The system includes sophisticated text processing for accurate command recogniti
 ```swift
 static func clean(_ phrase: String) -> String {
     var input = phrase
-
+    
     // Remove patterns like [text], (text), *text*
     let pattern = "\\[[^\\]]*\\]|\\([^\\)]*\\)|\\*[^*]*\\*"
     input = input.replacingOccurrences(of: pattern, with: "", options: .regularExpression)
-
+    
     // Trim whitespace
     input = trim(input)
-
+    
     // Convert to lowercase
     input = input.lowercased()
-
+    
     // Remove punctuation
     input = input.components(separatedBy: CharacterSet.punctuationCharacters).joined()
-
+    
     return input
 }
 ```
@@ -240,7 +254,7 @@ let listenerResult = Switchboard.addEventListener("sttNode", eventName: "transcr
           let transcriptionText = eventData as? String else { return }
 
     let result = TriggerDetector.detectTrigger(transcriptionText)
-
+    
     if result.detected {
         DispatchQueue.main.async {
             self.delegate?.triggerDetected(result.triggerType.rawValue, withKeyword: result.keyword)
@@ -249,9 +263,7 @@ let listenerResult = Switchboard.addEventListener("sttNode", eventName: "transcr
 }
 ```
 
-## SwiftUI Integration: Reactive Voice Control
-
-### The Control Delegate
+### SwiftUI Integration: Reactive Voice Control
 
 The SwiftUI interface responds to voice commands through a reactive delegate system:
 
@@ -259,13 +271,13 @@ The SwiftUI interface responds to voice commands through a reactive delegate sys
 class AppControlDelegate: NSObject, ControlDelegate, ObservableObject {
     @Published var detectedKeyword = ""
     weak var verticalListViewModel: ListViewModel?
-
+    
     func triggerDetected(_ triggerType: Int, withKeyword keyword: String) {
         guard let mode = TriggerType(rawValue: triggerType) else { return }
-
+        
         DispatchQueue.main.async {
             self.detectedKeyword = keyword
-
+            
             switch mode {
             case .next:
                 self.verticalListViewModel?.goNext()
@@ -299,21 +311,21 @@ struct AppControlView: View {
         VStack {
             Text("Voice Control Demo")
                 .font(.title)
-
+            
             Text(delegate.detectedKeyword)
                 .fontWeight(.semibold)
                 .font(.callout)
                 .frame(minHeight: 20)
-
+            
             ListView(viewModel: verticalListViewModel)
         }
     }
 }
 ```
 
-## Advanced Features: Smart Command Processing
+### Advanced Features: Smart Command Processing
 
-### Runtime Trigger System
+#### Runtime Trigger System
 
 One of the most impressive features is the runtime trigger system, which allows users to speak movie titles directly:
 
@@ -324,76 +336,40 @@ example?.setRuntimeTriggers(movieTitles)
 
 This dynamic system means users can say "Avatar" or "Inception" and jump directly to those movies, demonstrating how voice control can make navigation feel almost telepathic.
 
-### Longest-Match Algorithm
+#### Longest-Match Algorithm
 
 The system uses a sophisticated longest-match algorithm to handle overlapping keywords:
 
-```cpp
-bool detectTrigger(const std::string& phrase, TriggerType& outMode, std::string& outKeyword) {
-    size_t bestLength = 0;
-    TriggerType bestTriggerType = TriggerType::UNKNOWN;
-    std::string bestKeyword;
-
-    for (const auto& [triggerType, keywords] : triggerKeywords) {
-        std::string match = findLongestMatch(phrase, keywords);
-        if (!match.empty() && match.length() > bestLength) {
-            bestTriggerType = triggerType;
-            bestLength = match.length();
-            bestKeyword = match;
+```swift
+static func detectTrigger(_ phrase: String) -> TriggerResult {
+    let cleanedPhrase = clean(phrase)
+    var bestLength = 0
+    var bestTriggerType: TriggerType = .unknown
+    var bestKeyword = ""
+    
+    for (triggerType, keywords) in triggerKeywords {
+        let match = findLongestMatch(cleanedPhrase, keywords: keywords)
+        if !match.isEmpty && match.count > bestLength {
+            bestTriggerType = triggerType
+            bestLength = match.count
+            bestKeyword = match
         }
     }
-
-    return bestLength > 0;
+    
+    let detected = bestLength > 0
+    return TriggerResult(triggerType: bestTriggerType, keyword: bestKeyword, detected: detected)
 }
 ```
 
 This ensures that more specific commands take precedence over general ones, providing intuitive behavior.
 
-## Performance Optimization: Voice Activity Detection
-
-### Silero VAD Configuration
-
-The Silero Voice Activity Detection (VAD) system is carefully tuned for optimal performance:
-
-```json
-{
-  "id": "vadNode",
-  "type": "SileroVAD.SileroVAD",
-  "config": {
-    "frameSize": 512,
-    "threshold": 0.5,
-    "minSilenceDurationMs": 40
-  }
-}
-```
-
-These settings balance sensitivity with accuracy, ensuring the system responds quickly to speech while avoiding false triggers.
-
-### Whisper STT Optimization
-
-The Whisper Speech-to-Text engine is configured for maximum performance:
-
-```json
-{
-  "id": "sttNode",
-  "type": "Whisper.WhisperSTT",
-  "config": {
-    "initializeModel": true,
-    "useGPU": true
-  }
-}
-```
-
-GPU acceleration significantly improves transcription speed, making real-time voice control feel instantaneous.
-
-## Customization: Extending the Voice Control System
+## Going Further: Extending the Voice Control System
 
 ### Adding New Commands
 
 Expanding the voice control system is straightforward:
 
 1. **Add new trigger types:**
-
    ```swift
    @objc enum TriggerType: Int {
        case next, back, like, dislike, expand
@@ -403,7 +379,6 @@ Expanding the voice control system is straightforward:
    ```
 
 2. **Define corresponding keywords:**
-
    ```swift
    private static var triggerKeywords: [TriggerType: [String]] = [
        .customAction: ["custom", "special", "action"],
@@ -425,6 +400,63 @@ Fine-tune the audio processing pipeline by modifying `AudioGraph.json`:
 - **Modify buffer sizes** for different latency/accuracy tradeoffs
 - **Update sample rates** based on your specific requirements
 
+### Performance Optimization
+
+#### Voice Activity Detection Configuration
+
+The Silero Voice Activity Detection (VAD) system is carefully tuned for optimal performance:
+
+```json
+{
+  "id": "vadNode",
+  "type": "SileroVAD.SileroVAD",
+  "config": {
+    "frameSize": 512,
+    "threshold": 0.5,
+    "minSilenceDurationMs": 40
+  }
+}
+```
+
+These settings balance sensitivity with accuracy, ensuring the system responds quickly to speech while avoiding false triggers.
+
+#### Whisper STT Optimization
+
+The Whisper Speech-to-Text engine is configured for maximum performance:
+
+```json
+{
+  "id": "sttNode",
+  "type": "Whisper.WhisperSTT",
+  "config": {
+    "initializeModel": true,
+    "useGPU": true
+  }
+}
+```
+
+GPU acceleration significantly improves transcription speed, making real-time voice control feel instantaneous.
+
+### Real-World Applications
+
+#### Entertainment Apps
+- **"Play next episode"** - Hands-free binge watching
+- **"Add to favorites"** - Quick content curation
+- **"Skip intro"** - Seamless viewing experience
+
+#### Productivity Apps
+- **"Create new note"** - Instant task capture
+- **"Mark as complete"** - Efficient task management
+- **"Set reminder"** - Voice-driven scheduling
+
+#### E-commerce Apps
+- **"Add to cart"** - Effortless shopping
+- **"Show reviews"** - Quick product research
+- **"Track order"** - Instant status updates
+
+#### Accessibility Applications
+Voice control isn't just convenient—it's essential for users with mobility challenges or visual impairments. On-device processing ensures this accessibility works everywhere, not just when connected to the internet.
+
 ## Project Structure: Understanding the Codebase
 
 ```
@@ -444,34 +476,9 @@ scripts/
 
 This clean Swift architecture separates concerns while maintaining performance and type safety, making the codebase maintainable and extensible with full iOS integration.
 
-## Real-World Applications: Beyond the Demo
-
-### Entertainment Apps
-
-- **"Play next episode"** - Hands-free binge watching
-- **"Add to favorites"** - Quick content curation
-- **"Skip intro"** - Seamless viewing experience
-
-### Productivity Apps
-
-- **"Create new note"** - Instant task capture
-- **"Mark as complete"** - Efficient task management
-- **"Set reminder"** - Voice-driven scheduling
-
-### E-commerce Apps
-
-- **"Add to cart"** - Effortless shopping
-- **"Show reviews"** - Quick product research
-- **"Track order"** - Instant status updates
-
-### Accessibility Applications
-
-Voice control isn't just convenient—it's essential for users with mobility challenges or visual impairments. On-device processing ensures this accessibility works everywhere, not just when connected to the internet.
-
 ## Performance Considerations
 
 ### Memory Management
-
 The SwitchboardSDK efficiently manages memory usage, but consider these best practices:
 
 - **Initialize models once** during app startup
@@ -479,7 +486,6 @@ The SwitchboardSDK efficiently manages memory usage, but consider these best pra
 - **Monitor memory usage** during development
 
 ### Battery Life
-
 On-device AI processing is surprisingly efficient:
 
 - **Modern neural processing units** handle inference with minimal power consumption
@@ -487,7 +493,6 @@ On-device AI processing is surprisingly efficient:
 - **Optimized algorithms** in SwitchboardSDK minimize computational overhead
 
 ### Latency Optimization
-
 For the best user experience:
 
 - **Keep audio buffer sizes reasonable** (512 samples works well)
@@ -497,7 +502,6 @@ For the best user experience:
 ## Testing and Debugging
 
 ### Voice Command Testing
-
 Systematic testing ensures reliable voice recognition:
 
 1. **Test in various noise environments**
@@ -506,32 +510,12 @@ Systematic testing ensures reliable voice recognition:
 4. **Validate edge cases with similar-sounding words**
 
 ### Performance Profiling
-
 Use Xcode's profiling tools to monitor:
 
 - **CPU usage** during voice processing
 - **Memory allocation** patterns
 - **Audio processing latency**
 - **UI responsiveness** during voice commands
-
-## The Future of Voice Control
-
-### Emerging Possibilities
-
-As on-device AI continues to evolve, we're seeing exciting developments:
-
-- **Multi-language support** for global applications
-- **Context-aware commands** that understand user intent
-- **Personalized voice models** that adapt to individual users
-- **Gesture-voice combinations** for multimodal interfaces
-
-### Integration Opportunities
-
-Voice control works beautifully with other technologies:
-
-- **Augmented Reality** - Voice commands in spatial interfaces
-- **Machine Learning** - Predictive command suggestions
-- **IoT Integration** - Voice control extending to connected devices
 
 ## Conclusion: Voice Control as a Competitive Advantage
 
@@ -543,4 +527,4 @@ The code is open source, the technology is mature, and the user demand is clear.
 
 ---
 
-_Ready to start building? Download the complete source code and start experimenting with voice control in your iOS apps today. The future of user interaction is voice, and it's available now._
+*Ready to start building? Download the complete source code and start experimenting with voice control in your iOS apps today. The future of user interaction is voice, and it's available now.*
