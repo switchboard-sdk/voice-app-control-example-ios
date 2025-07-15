@@ -4,7 +4,7 @@ set -eu
 
 PROJECT_DIR="$(git rev-parse --show-toplevel)"
 PLATFORM="ios"
-SDK_VERSION="release/3.0.0-beta"
+SDK_VERSION="tayyabjaved/v3-example-release-build" #release/3.0.0-beta
 
 PACKAGE_NAMES=(
     "SwitchboardSDK"

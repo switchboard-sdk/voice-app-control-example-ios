@@ -4,6 +4,9 @@ Example iOS app that showcases a voice-controlled navigation using the Switchboa
 
 ## How to build
 
+We use the following verions of respective IDEs:
+Xcode: 16.2
+
 1. **Download and setup SwitchboardSDK frameworks**
 
 ```bash
@@ -91,6 +94,3 @@ The voice pipeline is configured in `AudioGraph.json`:
 
 - Modify `AudioGraph.json` to adjust VAD sensitivity
 - Update buffer sizes and sample rates as needed
-
-
-
