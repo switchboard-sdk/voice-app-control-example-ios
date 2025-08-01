@@ -48,8 +48,8 @@ You can say following commands to executed attached actions:
 
 **Navigation:**
 
-- **Next**: "next", "forward", "skip", "down"
-- **Previous**: "back", "last", "previous", "up"
+- **Next**: "down", "forward", "skip", "next"
+- **Previous**: "up", "last", "previous", "back"
 
 **Actions:**
 
