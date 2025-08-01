@@ -1,0 +1,82 @@
+import SwiftUI
+import Foundation
+
+class AppControlDelegate: NSObject, ObservableObject {
+    @Published var detectedKeyword = ""
+    
+    weak var listViewModel: ListViewModel?
+    
+    // Trigger mode handler with detected keyword
+    func triggerDetected(_ triggerType: TriggerType, withKeyword keyword: String) {
+        
+        DispatchQueue.main.async {
+            self.detectedKeyword = keyword
+            
+            switch triggerType {
+            case .down:
+                self.listViewModel?.down()
+            case .up:
+                self.listViewModel?.up()
+            case .like:
+                self.listViewModel?.toggleLike()
+            case .dislike:
+                self.listViewModel?.toggleDislike()
+            case .expand:
+                self.listViewModel?.toggleExpand()
+            case .runtimeTriggers:
+                // Find the movie by title and select it
+                if let movieIndex = self.listViewModel?.items.firstIndex(where: { $0.title.lowercased() == keyword }) {
+                    self.listViewModel?.selectItem(at: movieIndex)
+                }
+            case .unknown:
+                print("unknown command")
+            }
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.detectedKeyword = ""
+        }
+    }
+}
+
+struct AppControlView: View {
+    @StateObject private var delegate = AppControlDelegate()
+    @StateObject private var verticalListViewModel = ListViewModel()
+    @State private var engine: AppControlEngine?
+
+    var body: some View {
+        VStack(spacing: 10) {
+            Text("Voice Control Demo")
+                .font(.title)
+                .padding()
+            
+            Text("- You can navigate by saying title of a movie \n- Execute actions with following commands \n- Up | Down | Like | Dislike | Expand")
+            
+            Text(delegate.detectedKeyword)
+                .fontWeight(.semibold)
+                .font(.callout)
+                .frame(minHeight: 20)
+
+            Spacer()
+            
+            ListView(viewModel: verticalListViewModel)
+            
+        }
+        .padding()
+        .onAppear {
+            engine = AppControlEngine()
+            engine?.delegate = delegate
+            delegate.listViewModel = verticalListViewModel
+            
+            // Set runtime triggers with movie titles from data
+            let movieTitles = DataSource.shared.movieData.map { $0.title }
+            engine?.setRuntimeTriggers(movieTitles)
+            
+            engine?.createEngine()
+            engine?.startEngine()
+        }
+        .onDisappear {
+            engine?.stopEngine()
+        }
+    }
+}
