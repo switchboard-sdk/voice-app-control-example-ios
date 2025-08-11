@@ -1,6 +1,6 @@
 # Voice Controlled App Example - iOS
 
-Example iOS app that showcases a voice-controlled navigation using the SwitchboardSDK. This example app allows users to navigate through a movie list and interact with items using voice commands.
+Example iOS app that showcases a voice-controlled navigation using the Switchboard SDK. This example app allows users to navigate through a movie list and interact with items using voice commands.
 
 ## How to build
 
@@ -10,7 +10,7 @@ We used the following versions of respective IDEs:
 
 - Xcode: 16.2
 
-### Download SwitchboardSDK frameworks
+### Download Switchboard SDK frameworks
 
 Run the following command in root of the project.
 
@@ -26,10 +26,10 @@ Open AppControlExample.xcodeproj in Xcode
 open AppControlExample.xcodeproj
 ```
 
-### Configure SwitchboardSDK credentials
+### Configure Switchboard SDK credentials
 
 - Open `AppControlExampleApp.swift`
-- Add your SwitchboardSDK App ID and App Secret in the initialization:
+- Add your Switchboard SDK App ID and App Secret in the initialization ([sign up here](https://console.switchboard.audio/register) to receive your appID and appSecret values):
 
 ```swift
 SBSwitchboardSDK.initialize(withAppID: "YOUR_APP_ID", appSecret: "YOUR_APP_SECRET")
@@ -76,9 +76,9 @@ The voice pipeline is configured in `AudioGraph.json`:
 
 ### SDK Components
 
-- **SBSwitchboardSDK**: Core audio processing engine
-- **SBWhisperExtension**: Speech-to-text conversion
-- **SBSileroVADExtension**: Voice activity detection
+- `SBSwitchboardSDK`: Core audio processing engine
+- `SBWhisperExtension`: Speech-to-text conversion
+- `SBSileroVADExtension`: Voice activity detection
 
 **Movie Navigation:**
 
