@@ -18,7 +18,7 @@
         },
         {
           "id": "vadNode",
-          "type": "SileroVAD.SileroVAD",
+          "type": "Silero.VAD",
           "config": {
                   "frameSize": 512,
                   "threshold": 0.5,
@@ -27,7 +27,7 @@
         },
         {
           "id": "sttNode",
-          "type": "Whisper.WhisperSTT",
+          "type": "Whisper.STT",
           "config": {
             "initializeModel": true,
             "useGPU": true
@@ -52,7 +52,7 @@
           "destinationNode": "sttNode"
         },
         {
-          "sourceNode": "vadNode.end",
+          "sourceNode": "vadNode.speechEnded",
           "destinationNode": "sttNode.transcribe"
         }
       ]
