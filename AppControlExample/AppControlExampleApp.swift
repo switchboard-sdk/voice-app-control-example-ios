@@ -13,11 +13,19 @@ import SwitchboardWhisper
 
 @main
 struct AppControlExampleApp: App {
-    
+
     init () {
-        SBSwitchboardSDK.initialize(withAppID: "YOUR_APP_ID", appSecret: "YOUR_APP_SECRET")
-        SBWhisperExtension.initialize(withConfig: [:])
-        SBSileroVADExtension.initialize(withConfig: [:])
+        SBWhisperExtension.loadExtension()
+        SBSileroVADExtension.loadExtension()
+        let initConfig: [String: Any] = [
+            "appID": "YOUR_APP_ID",
+            "appSecret": "YOUR_APP_SECRET",
+            "extensions": [
+                "Whisper": [:],
+                "Silero": [:],
+            ],
+        ]
+        Switchboard.initialize(withConfig: initConfig)
     }
     var body: some Scene {
         WindowGroup {

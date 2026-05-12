@@ -28,9 +28,11 @@ class AppControlEngine {
 
         engineID = createEngineResult.value! as String
         
-        let listenerResult = Switchboard.addEventListener("sttNode", eventName: "transcription") { [weak self] eventData in
+        let listenerResult = Switchboard.addEventListener("sttNode", eventName: "transcribed") { [weak self] eventData in
             guard let self = self,
-                  let transcriptionText = eventData as? String else { return }
+                  let envelope = eventData as? [AnyHashable: Any],
+                  let data = envelope["data"] as? [AnyHashable: Any],
+                  let transcriptionText = data["text"] as? String else { return }
 
             let result = TriggerDetector.detectTrigger(transcriptionText)
             
@@ -49,14 +51,14 @@ class AppControlEngine {
     }
     
     func startEngine() {
-        let startEngineResult = Switchboard.callAction(withObjectID: engineID, actionName: "start", params: nil)
+        let startEngineResult = Switchboard.callAction(withObject: engineID, actionName: "start", params: nil)
         if startEngineResult.error != nil {
             print("Failed to start audio engine: \(startEngineResult.error?.localizedDescription ?? "Unknown error")")
         }
     }
     
     func stopEngine() {
-        let stopEngineResult = Switchboard.callAction(withObjectID: engineID, actionName: "stop", params: nil)
+        let stopEngineResult = Switchboard.callAction(withObject: engineID, actionName: "stop", params: nil)
         if stopEngineResult.error != nil {
             print("Failed to stop audio engine: \(stopEngineResult.error?.localizedDescription ?? "Unknown error")")
         }

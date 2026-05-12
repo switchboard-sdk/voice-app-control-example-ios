@@ -15,18 +15,8 @@
 		A6B294D02E16089000D67D19 /* SwitchboardWhisper.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A6B294CE2E16089000D67D19 /* SwitchboardWhisper.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A6B294D22E1608E600D67D19 /* SwitchboardSDK.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6B294D12E1608E600D67D19 /* SwitchboardSDK.xcframework */; };
 		A6B294D32E1608E600D67D19 /* SwitchboardSDK.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A6B294D12E1608E600D67D19 /* SwitchboardSDK.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		A6B294DA2E160DC800D67D19 /* libggml-cpu.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6B294D42E160DC800D67D19 /* libggml-cpu.xcframework */; };
-		A6B294DB2E160DC800D67D19 /* libggml-cpu.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A6B294D42E160DC800D67D19 /* libggml-cpu.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		A6B294DC2E160DC800D67D19 /* libggml.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6B294D52E160DC800D67D19 /* libggml.xcframework */; };
-		A6B294DD2E160DC800D67D19 /* libggml.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A6B294D52E160DC800D67D19 /* libggml.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		A6B294DE2E160DC800D67D19 /* libwhisper.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6B294D62E160DC800D67D19 /* libwhisper.xcframework */; };
-		A6B294DF2E160DC800D67D19 /* libwhisper.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A6B294D62E160DC800D67D19 /* libwhisper.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		A6B294E02E160DC800D67D19 /* libggml-blas.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6B294D72E160DC800D67D19 /* libggml-blas.xcframework */; };
-		A6B294E12E160DC800D67D19 /* libggml-blas.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A6B294D72E160DC800D67D19 /* libggml-blas.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		A6B294E22E160DC800D67D19 /* libwhisper.coreml.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6B294D82E160DC800D67D19 /* libwhisper.coreml.xcframework */; };
-		A6B294E32E160DC800D67D19 /* libwhisper.coreml.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A6B294D82E160DC800D67D19 /* libwhisper.coreml.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		A6B294E42E160DC800D67D19 /* libggml-base.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6B294D92E160DC800D67D19 /* libggml-base.xcframework */; };
-		A6B294E52E160DC800D67D19 /* libggml-base.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A6B294D92E160DC800D67D19 /* libggml-base.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CC000021CC000021CC000021 /* whisper.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC000020CC000020CC000020 /* whisper.xcframework */; };
+		CC000022CC000022CC000022 /* whisper.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CC000020CC000020CC000020 /* whisper.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,15 +43,10 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				A6B294E12E160DC800D67D19 /* libggml-blas.xcframework in Embed Frameworks */,
-				A6B294DF2E160DC800D67D19 /* libwhisper.xcframework in Embed Frameworks */,
 				A6B294D32E1608E600D67D19 /* SwitchboardSDK.xcframework in Embed Frameworks */,
-				A6B294DD2E160DC800D67D19 /* libggml.xcframework in Embed Frameworks */,
-				A6B294DB2E160DC800D67D19 /* libggml-cpu.xcframework in Embed Frameworks */,
 				A69DAEFF2E1CE30F00DC353D /* SwitchboardOnnx.xcframework in Embed Frameworks */,
-				A6B294E32E160DC800D67D19 /* libwhisper.coreml.xcframework in Embed Frameworks */,
 				A6B294D02E16089000D67D19 /* SwitchboardWhisper.xcframework in Embed Frameworks */,
-				A6B294E52E160DC800D67D19 /* libggml-base.xcframework in Embed Frameworks */,
+				CC000022CC000022CC000022 /* whisper.xcframework in Embed Frameworks */,
 				A6B294CD2E16088500D67D19 /* SwitchboardSileroVAD.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -75,14 +60,9 @@
 		A6B294A12E15F67100D67D19 /* AppControlExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AppControlExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6B294AB2E15F67100D67D19 /* AppControlExampleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AppControlExampleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6B294CB2E16088500D67D19 /* SwitchboardSileroVAD.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = SwitchboardSileroVAD.xcframework; path = Frameworks/SwitchboardSileroVAD/iOS/SwitchboardSileroVAD.xcframework; sourceTree = "<group>"; };
-		A6B294CE2E16089000D67D19 /* SwitchboardWhisper.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = SwitchboardWhisper.xcframework; path = Frameworks/SwitchboardWhisper/iOS/SwitchboardWhisper.xcframework; sourceTree = "<group>"; };
-		A6B294D12E1608E600D67D19 /* SwitchboardSDK.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = SwitchboardSDK.xcframework; path = Frameworks/SwitchboardSDK/iOS/SwitchboardSDK.xcframework; sourceTree = "<group>"; };
-		A6B294D42E160DC800D67D19 /* libggml-cpu.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = "libggml-cpu.xcframework"; path = "Frameworks/SwitchboardWhisper/iOS/libs/libggml-cpu.xcframework"; sourceTree = "<group>"; };
-		A6B294D52E160DC800D67D19 /* libggml.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libggml.xcframework; path = Frameworks/SwitchboardWhisper/iOS/libs/libggml.xcframework; sourceTree = "<group>"; };
-		A6B294D62E160DC800D67D19 /* libwhisper.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libwhisper.xcframework; path = Frameworks/SwitchboardWhisper/iOS/libs/libwhisper.xcframework; sourceTree = "<group>"; };
-		A6B294D72E160DC800D67D19 /* libggml-blas.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = "libggml-blas.xcframework"; path = "Frameworks/SwitchboardWhisper/iOS/libs/libggml-blas.xcframework"; sourceTree = "<group>"; };
-		A6B294D82E160DC800D67D19 /* libwhisper.coreml.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libwhisper.coreml.xcframework; path = Frameworks/SwitchboardWhisper/iOS/libs/libwhisper.coreml.xcframework; sourceTree = "<group>"; };
-		A6B294D92E160DC800D67D19 /* libggml-base.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = "libggml-base.xcframework"; path = "Frameworks/SwitchboardWhisper/iOS/libs/libggml-base.xcframework"; sourceTree = "<group>"; };
+		A6B294CE2E16089000D67D19 /* SwitchboardWhisper.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = SwitchboardWhisper.xcframework; path = Frameworks/SwitchboardWhisper/ios/Release/SwitchboardWhisper.xcframework; sourceTree = "<group>"; };
+		A6B294D12E1608E600D67D19 /* SwitchboardSDK.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = SwitchboardSDK.xcframework; path = Frameworks/SwitchboardSDK/ios/SwitchboardSDK.xcframework; sourceTree = "<group>"; };
+		CC000020CC000020CC000020 /* whisper.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = whisper.xcframework; path = Frameworks/SwitchboardWhisper/ios/Release/lib/whisper.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -108,15 +88,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A6B294E02E160DC800D67D19 /* libggml-blas.xcframework in Frameworks */,
-				A6B294DE2E160DC800D67D19 /* libwhisper.xcframework in Frameworks */,
 				A6B294D22E1608E600D67D19 /* SwitchboardSDK.xcframework in Frameworks */,
-				A6B294DC2E160DC800D67D19 /* libggml.xcframework in Frameworks */,
-				A6B294DA2E160DC800D67D19 /* libggml-cpu.xcframework in Frameworks */,
 				A69DAEFE2E1CE30F00DC353D /* SwitchboardOnnx.xcframework in Frameworks */,
-				A6B294E22E160DC800D67D19 /* libwhisper.coreml.xcframework in Frameworks */,
 				A6B294CF2E16089000D67D19 /* SwitchboardWhisper.xcframework in Frameworks */,
-				A6B294E42E160DC800D67D19 /* libggml-base.xcframework in Frameworks */,
+				CC000021CC000021CC000021 /* whisper.xcframework in Frameworks */,
 				A6B294CC2E16088500D67D19 /* SwitchboardSileroVAD.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -163,14 +138,9 @@
 			isa = PBXGroup;
 			children = (
 				A69DAEFD2E1CE30F00DC353D /* SwitchboardOnnx.xcframework */,
-				A6B294D52E160DC800D67D19 /* libggml.xcframework */,
-				A6B294D92E160DC800D67D19 /* libggml-base.xcframework */,
-				A6B294D72E160DC800D67D19 /* libggml-blas.xcframework */,
-				A6B294D42E160DC800D67D19 /* libggml-cpu.xcframework */,
-				A6B294D62E160DC800D67D19 /* libwhisper.xcframework */,
-				A6B294D82E160DC800D67D19 /* libwhisper.coreml.xcframework */,
 				A6B294D12E1608E600D67D19 /* SwitchboardSDK.xcframework */,
 				A6B294CE2E16089000D67D19 /* SwitchboardWhisper.xcframework */,
+				CC000020CC000020CC000020 /* whisper.xcframework */,
 				A6B294CB2E16088500D67D19 /* SwitchboardSileroVAD.xcframework */,
 			);
 			name = Frameworks;
